@@ -166,12 +166,11 @@ export async function listAdvanceOrders(): Promise<AdvanceOrder[]> {
       if (error) {
         console.error('[listAdvanceOrders] Supabase error:', error.message)
       } else if (Array.isArray(data)) {
+        // The database is the source of truth; the device copy is only an offline backup,
+        // so orders deleted on the server never come back from it
         const remote = data.map(row => normalizeOrder(row as Record<string, unknown>))
-        const remoteIds = new Set(remote.map(r => r.id))
-        const localOnly = local.filter(l => !remoteIds.has(l.id))
-        const merged = [...remote, ...localOnly].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        saveLocalOrders(merged)
-        return merged
+        saveLocalOrders(remote)
+        return remote
       }
     } catch (err) { console.error('[listAdvanceOrders] Exception:', err) }
   }

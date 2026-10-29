@@ -177,7 +177,7 @@ type PosProps = {
 export default function Pos(props: PosProps = {}) {
   const embeddedMode = Boolean(props.isEmbedded)
   const { products, fetchProducts } = useProductStore()
-  const { getVariants, fetchVariants } = useVariantStore()
+  const { getVariants, fetchVariants, refetchVariants } = useVariantStore()
   const { lang } = useLangStore()
   const l = (en: string, ta: string) => lang === 'ta' ? ta : en
   const navigate = useNavigate()
@@ -246,8 +246,9 @@ export default function Pos(props: PosProps = {}) {
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    void fetchProducts()
-    void fetchVariants()
+    // Always load the current catalogue when billing opens (never a list cached earlier in the session)
+    void fetchProducts(true)
+    void refetchVariants()
     if (!isDatabaseConfigured) return
 
     db.from('coupons').select('code').eq('is_active', true).order('created_at', { ascending: false }).limit(20)
@@ -257,7 +258,8 @@ export default function Pos(props: PosProps = {}) {
       })
 
     const productChannel = db.channel('pos-live')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => void fetchProducts())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => void fetchProducts(true))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'product_variants' }, () => void refetchVariants())
       .subscribe()
 
     // Load active categories in sort_order
@@ -267,7 +269,7 @@ export default function Pos(props: PosProps = {}) {
       })
 
     return () => { void db.removeChannel(productChannel) }
-  }, [fetchProducts, fetchVariants])
+  }, [fetchProducts, refetchVariants])
 
   // ── Derived data ──────────────────────────────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -49,10 +49,10 @@ export const birthdayService = {
         .select('id, name, phone, birth_date, created_at')
         .order('name', { ascending: true })
       if (!error && data) {
-        // Birthdays that could not be saved to the database at billing time are cached on this device; keep them visible
+        // The database is the source of truth; the device copy is only used when it cannot be reached
         const remote = data as CustomerBirthday[]
-        const known = new Set(remote.map(b => phoneKey(b.phone)))
-        return [...remote, ...local.filter(b => !known.has(phoneKey(b.phone)))]
+        writeLocal(LOCAL_KEY, remote)
+        return remote
       }
       console.warn('Birthday fetch failed, using local cache:', error?.message)
     }

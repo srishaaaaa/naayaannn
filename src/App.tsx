@@ -94,6 +94,7 @@ function AppShell() {
   const initialize = useAuthStore((state) => state.initialize)
   const fetchProducts = useProductStore((state) => state.fetchProducts)
   const fetchVariants = useVariantStore((state) => state.fetchVariants)
+  const refetchVariants = useVariantStore((state) => state.refetchVariants)
   const { isLoggedIn, role } = useAdminAuthStore()
 
   const hasStaffOrAdminAccess = Boolean(isLoggedIn && (role === 'admin' || role === 'staff'))
@@ -139,17 +140,30 @@ function AppShell() {
       return
     }
 
+    // A change on the server always reloads (a cached list would keep showing deleted items)
     const productChannel = db
       .channel('admin-products-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-        void fetchProducts()
+        void fetchProducts(true)
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'product_variants' }, () => {
+        void refetchVariants()
       })
       .subscribe()
 
+    // Coming back to the app (tab switch, phone unlock) shows the current catalogue
+    const refreshOnReturn = () => {
+      if (document.visibilityState !== 'visible') return
+      void fetchProducts(true)
+      void refetchVariants()
+    }
+    document.addEventListener('visibilitychange', refreshOnReturn)
+
     return () => {
       void db.removeChannel(productChannel)
+      document.removeEventListener('visibilitychange', refreshOnReturn)
     }
-  }, [fetchProducts, fetchVariants, hasStaffOrAdminAccess])
+  }, [fetchProducts, fetchVariants, refetchVariants, hasStaffOrAdminAccess])
 
   return (
     <div className="ios-app-shell w-full max-w-[100vw] bg-bgMain print:block print:h-auto print:overflow-visible">
