@@ -310,16 +310,18 @@ export default function AddProductModal({ isOpen, onClose, onSuccess }: AddProdu
                     const upd = (key: keyof VariantRow) => (e: React.ChangeEvent<HTMLInputElement>) =>
                       setVariants(rows => rows.map(r => (r.id === v.id ? { ...r, [key]: e.target.value } : r)))
                     return (
-                      <div key={v.id}>
-                      <div className="grid grid-cols-2 sm:grid-cols-[1.4fr_1fr_1fr_0.8fr_1.4fr_auto] items-end gap-2 rounded-xl bg-gray-50 p-3">
-                        <label className="block"><span className={label}>Variant {i + 1}</span><input className={input} value={v.name} onChange={upd('name')} placeholder="e.g., M / 32 / Red" /></label>
-                        <label className="block"><span className={label}>Price (₹)</span><input className={input} value={v.price} onChange={upd('price')} inputMode="decimal" placeholder={form.price || '0.00'} /></label>
-                        <label className="block"><span className={label}>Cost (₹)</span><input className={input} value={v.cost} onChange={upd('cost')} inputMode="decimal" placeholder={form.cost || '0.00'} /></label>
-                        <label className="block"><span className={label}>Stock</span><input className={input} value={v.stock} onChange={upd('stock')} inputMode="numeric" /></label>
-                        <label className="block"><span className={label}>Barcode</span><input className={input} value={v.barcode} onChange={upd('barcode')} placeholder="Optional" /></label>
-                        <button type="button" onClick={() => setVariants(rows => rows.filter(r => r.id !== v.id))} aria-label="Remove variant"
-                          className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-[#DC2626]"><Trash2 size={17} /></button>
-                      </div>
+                      <div key={v.id} className="space-y-3 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+                        <div className="flex items-end gap-2">
+                          <label className="block min-w-0 flex-1"><span className={label}>Variant {i + 1}</span><input className={input} value={v.name} onChange={upd('name')} placeholder="e.g., M / 32 / Red" /></label>
+                          <button type="button" onClick={() => setVariants(rows => rows.filter(r => r.id !== v.id))} aria-label={`Remove variant ${i + 1}`}
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-[#DC2626]"><Trash2 size={17} /></button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                          <label className="block min-w-0"><span className={label}>Price (₹)</span><input className={input} value={v.price} onChange={upd('price')} inputMode="decimal" placeholder={form.price || '0.00'} /></label>
+                          <label className="block min-w-0"><span className={label}>Cost (₹)</span><input className={input} value={v.cost} onChange={upd('cost')} inputMode="decimal" placeholder={form.cost || '0.00'} /></label>
+                          <label className="block min-w-0"><span className={label}>Stock</span><input className={input} value={v.stock} onChange={upd('stock')} inputMode="numeric" /></label>
+                          <label className="block min-w-0"><span className={label}>Barcode</span><input className={input} value={v.barcode} onChange={upd('barcode')} placeholder="Optional" /></label>
+                        </div>
                       </div>
                     )
                   })}
