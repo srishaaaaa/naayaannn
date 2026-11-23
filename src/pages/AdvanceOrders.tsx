@@ -466,7 +466,6 @@ export default function AdvanceOrders({ onOrderCompleted }: AdvanceOrdersProps =
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-        <button type="button" onClick={() => { setForm(initialForm); setDepositSplit(emptySplitInput()); setError(''); setCreateOpen(true) }} className="inline-flex h-10 items-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black text-primary-100 shadow-md hover:bg-primary-hover cursor-pointer"><Plus size={17} strokeWidth={2.5} /> New Advance Order</button>
         <button type="button" onClick={() => void load()} title="Refresh" aria-label="Refresh" className="flex h-10 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 hover:text-[#111111]"><RefreshCw size={18} /></button>
         <div className="inline-flex flex-wrap items-center gap-4 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 shadow-[0_2px_10px_rgba(0,0,0,0.04)]">
           <label className="flex items-center gap-2"><span className="text-[10px] font-bold uppercase tracking-wider text-[#111111]">From:</span>
